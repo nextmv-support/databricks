@@ -57,8 +57,8 @@ class Flow(FlowSpec):
         # results we are aiming to extend with a plot.
         solution: dict | None = None
         for task_output in solution_output.solution.values():
-            if isinstance(task_output, dict) and "optimize" in task_output:
-                solution = task_output["optimize"]
+            if isinstance(task_output, dict) and "shiftsPerWorker" in task_output:
+                solution = task_output
                 break
         if solution is None:
             log("No solution data found from DBX job, skipping enhancement.")
