@@ -11,8 +11,18 @@ from nextpipe import FlowSpec, log, needs, step
 # >>> Workflow definition
 class Flow(FlowSpec):
     @step
-    def dbx(input: dict):
+    def dbx(data: dict):
         """Run DBX job."""
+        # We pass the input data as a `data` parameter to the job, if available and
+        # json-serializable.
+        input_data: dict = None
+        if data:
+            try:
+                json.dumps(data)
+                input_data = data
+            except Exception as err:
+                log(f"Input data is not JSON serializable, cannot pass to DBX job: {err}")
+
         # Parse options from command line arguments.
         options = parse_options()
         log(f"Databricks job ID: {DB_JOB}")
@@ -20,13 +30,13 @@ class Flow(FlowSpec):
         for key, value in options.items():
             log(f"  {key} = {value}")
 
-        # Read input from stdin if available (pass as parameter like the other options).
-        i = read_input()
-        if i:
-            log(f"Input data: {i}")
-            options["data"] = i
+        # Set input data if available.
+        if input_data is not None:
+            options["data"] = json.dumps(input_data)
+            log(f"Passing input data to DBX job, {len(options['data'])} bytes.")
 
         # Run the Databricks job with the specified job ID and options.
+        log("Starting Databricks job...")
         solution, stats = run_databricks_job(DB_JOB, options)
         log("Databricks job completed successfully.")
 
@@ -43,11 +53,18 @@ class Flow(FlowSpec):
         """Enhances the result."""
         log("Adding custom plot...")
 
-        solution = solution_output.solution["optimize"] if "optimize" in solution_output.solution else None
+        # As the user may change the tasks around, we search for the workforce scheduling
+        # results we are aiming to extend with a plot.
+        solution: dict | None = None
+        for task_output in solution_output.solution.values():
+            if isinstance(task_output, dict) and "optimize" in task_output:
+                solution = task_output["optimize"]
+                break
         if solution is None:
             log("No solution data found from DBX job, skipping enhancement.")
             return solution_output
 
+        # Create a simple bar chart of shifts assigned to each worker.
         shifts_per_worker = solution["shiftsPerWorker"]
         workers = list(shifts_per_worker.keys())
         shifts_counts = [shifts_per_worker[w] for w in workers]
@@ -59,6 +76,8 @@ class Flow(FlowSpec):
                 "yaxis": {"title": {"text": "Number of Shifts"}},
             },
         }
+
+        # Attach the plot as an asset to the solution output.
         solution_output.assets = [
             nextmv.Asset(
                 name="assignments",
@@ -67,13 +86,15 @@ class Flow(FlowSpec):
                 visual=nextmv.Visual(visual_schema=nextmv.VisualSchema.PLOTLY, label="Shift Assignments"),
             )
         ]
-
         return solution_output
 
 
 def main():
+    # Read input.
+    input_data = nextmv.load()
+
     # Run workflow
-    flow = Flow("DecisionFlow", {})
+    flow = Flow("DecisionFlow", input_data.data)
     flow.run()
 
     # Write out the result
@@ -81,6 +102,8 @@ def main():
 
 
 # DBX AUXILIARY
+# This functionality is still a bit experimental, but may eventually move to be supported
+# directly in nextmv.
 
 DB_API_KEY = os.getenv("DATABRICKS_TOKEN", "")
 if not DB_API_KEY:

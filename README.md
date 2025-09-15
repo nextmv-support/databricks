@@ -1,12 +1,13 @@
-# dbx-demo
+# Databricks Nextmv integration demo
 
-Databricks Nextmv integration demo.
+This is a demo showcasing how to integrate a Databricks job with a Nextmv
+workflow as the orchestrator and visual enhancer.
 
 This demo uses the [Gurobi workforce scheduling example][gurobi-example] as a
 starting point for the job running on Databricks. The tasks of the job can be
 arbitrarily modified/extended to fit your use case.
 
-## Setup
+## Get started
 
 1. Add this repo to your Databricks workspace.
     - Navigate to the workspace in the Databricks UI, click on the top right
@@ -49,6 +50,10 @@ arbitrarily modified/extended to fit your use case.
     - Navigate to your workflow app and click the `+` button next to "Runs".
     - Note: at the moment _some_ input is required though it is not used by this
       example. You can just pass `{"foo": "bar"}` as input.
+
+## Preview of a run on Nextmv Console
+
+![Run preview](./docs/run_preview.png)
 
 ## Next steps
 
