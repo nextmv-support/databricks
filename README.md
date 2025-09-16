@@ -7,7 +7,9 @@ This demo uses the [Gurobi workforce scheduling example][gurobi-example] as a
 starting point for the job running on Databricks. The tasks of the job can be
 arbitrarily modified/extended to fit your use case.
 
-## Get started
+## Setup
+
+These steps need to be done only once.
 
 1. Add this repo to your Databricks workspace.
     - Navigate to the workspace in the Databricks UI, click on the top right
@@ -46,10 +48,29 @@ arbitrarily modified/extended to fit your use case.
 6. Configure the default instance of the app to use the `dbx` secret collection.
     - Navigate to the "Instances" tab of the app, click on the default instance,
       edit it and select the `dbx` secret collection you just created.
-7. Run the app from [Nextmv Console][console].
+
+## Using the integration
+
+After everything is set up, here are some typical things to do when working with
+the integration.
+
+1. Make a run via [Nextmv Console][console].
     - Navigate to your workflow app and click the `+` button next to "Runs".
     - Note: at the moment _some_ input is required though it is not used by this
       example. You can just pass `{"foo": "bar"}` as input.
+    - You can also leverage experiments, run comparisons and other features of
+      the Nextmv platform.
+2. Make changes to the workflow code.
+    - Modify the code in the `workflow` folder as needed.
+    - Push the changes with `nextmv app push -a <app-id>`.
+    - You can also cut versions of the app and create new instances if needed
+      (e.g., simply via the console or by appending
+      `nextmv app push ... --create-version <version-id>` or similar when
+      pushing).
+    - Or, create more workflow apps as needed.
+3. Make changes to the job code.
+    - Modify the notebook in the `job` folder as needed or add more files.
+    - Push the changes via git (or update manually when not using Git).
 
 ## Preview of a run on Nextmv Console
 
