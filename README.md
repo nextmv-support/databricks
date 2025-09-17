@@ -74,7 +74,13 @@ the integration.
 
 ## Preview of a run on Nextmv Console
 
-![Run preview](./docs/run_preview.png)
+Starting the run:
+
+![Run preview](./docs/run_start.png)
+
+Finished run with custom visuals:
+
+![Run preview](./docs/run_custom_visuals.png)
 
 ## Next steps
 

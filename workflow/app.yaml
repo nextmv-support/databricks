@@ -4,3 +4,58 @@ python:
   pip-requirements: requirements.txt
 files:
   - main.py
+configuration:
+  options:
+    # We configure some options to be driven by Nextmv Console UI here.
+    # However, this is just an example. The job itself is intentionally
+    # kept as the unchanged Gurobi example, which does not expose any
+    # parameters.
+    validation:
+      enforce: none
+    items:
+      - name: integer_slider
+        option_type: int
+        default: 10
+        required: true
+        additional_attributes:
+          min: 0
+          max: 100
+          step: 5
+        ui:
+          control_type: slider
+          display_name: Integer Slider
+      - name: integer_input
+        option_type: int
+        default: 10
+        required: true
+        ui:
+          hidden_from:
+            - operator
+          control_type: input
+          display_name: Integer Input
+      - name: string_select
+        option_type: string
+        additional_attributes:
+          values:
+            - choice_1
+            - choice_2
+            - choice_3
+        ui:
+          control_type: select
+          display_name: String Select
+      - name: string_input
+        option_type: string
+        default: foo
+        ui:
+          control_type: input
+      - name: boolean_input
+        option_type: bool
+        default: true
+        required: true
+      - name: float_input
+        option_type: float
+        default: 1.5
+        ui:
+          control_type: input
+          hidden_from:
+            - operator
